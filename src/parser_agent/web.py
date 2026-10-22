@@ -5,10 +5,10 @@ file, the passports next to them and the points in Qdrant:
 
   * the list of tables with their descriptions and sizes;
   * one table in full: the columns, their types, samples and value domains;
-  * the chat: every question runs the "chat" process of the flow — a crew in
-    which a coordinator delegates the table search and the SQL to an analyst and
-    a chart to a visualization specialist, and answers by the rows the database
-    returned. When it cannot tell which table is meant, it asks.
+  * the chat: every question runs the "chat" process of the flow — the Jev tree
+    finds the figures of one line, the Jev loop sends the rest to the SQL agent
+    and a chart to the visualizer, and the answer analyst answers by the rows the
+    database returned. When it cannot tell which table is meant, it asks.
 
 The page itself is a single static file, `web/index.html`; this module only
 serves the data to it. Nothing is served without signing in first
@@ -39,7 +39,7 @@ from .chats import DEFAULT_CHATS_DB, ChatStore, make_title
 from .catalog import connect_existing, list_tables, quote_identifier
 from .crew import progress
 from .crew.chat_crew import ChatRun
-from .indexer import DEFAULT_COLLECTION, DEFAULT_EMBED_MODEL, DEFAULT_URL, catalog_files
+from .indexer import DEFAULT_COLLECTION, DEFAULT_EMBED_MODEL, DEFAULT_URL
 from .outputs import DEFAULT_OUTPUT_DIR
 from .routing import DEFAULT_ROUTES, Task
 from .search import read_catalogs
@@ -426,24 +426,4 @@ def create_app(
                 or chats.chart_owner(chart_id) != request.state.user):
             raise HTTPException(status_code=404, detail="No such chart")
         return FileResponse(path, media_type="image/png")
-
-    @app.get("/api/status")
-    def status() -> JSONResponse:
-        """What the page shows in the sidebar: are the sources alive."""
-        state = {
-            "database": db_path.exists(),
-            "catalogs": len(catalog_files(catalog_dir)),
-            "qdrant": False,
-            "points": None,
-        }
-        try:
-            from qdrant_client import QdrantClient
-
-            client = QdrantClient(url=qdrant_url)
-            state["points"] = client.count(collection).count
-            state["qdrant"] = True
-        except Exception as exc:
-            logger.debug("Qdrant недоступен: %s", exc)
-        return JSONResponse(state)
-
     return app

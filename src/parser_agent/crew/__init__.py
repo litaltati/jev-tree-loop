@@ -1,5 +1,5 @@
-"""The chat crew: a coordinator, a data retrieval analyst and a visualization specialist.
+"""What the agents of the chat stand on: instructions, tools, the chart sandbox, progress steps.
 
-Run by the "chat" process of the flow (flow.py) for every question asked in the
-web chat; the "parse" process never touches it.
+Used by the Jev loop (jev_loop/) for every question asked in the web chat; the
+"parse" process never touches it.
 """

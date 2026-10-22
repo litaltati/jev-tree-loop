@@ -162,9 +162,8 @@ class ParserAgentFlow(Flow[ParserAgentState]):
         line, the SQL agent for more, no data at all. Whatever the tree found —
         its rows, its notes, the first step it already knows — goes into the
         loop's one state (jev_loop/); there Jev picks the visualizer when a chart
-        is wanted, and the answer analyst writes every answer. The crew of
-        crew/chat_crew.py is not used here. The tree runs in a thread: its calls to Jev are
-        blocking, and the context goes with it, so the steps and the Langfuse
+        is wanted, and the answer analyst writes every answer. The tree runs in
+        a thread: its calls to Jev are blocking, and the context goes with it, so the steps and the Langfuse
         spans stay with this question.
         """
         run = self.state.chat

@@ -1,9 +1,7 @@
 """The three agents of the loop, each run on its own with its task built from the state.
 
-The SQL agent and the visualizer are the ones of the crew (crew/agents.py), with
-the same instructions and the same tools; here each gets a task of its own
-instead of one handed down by a coordinator. The task is written from the
-LoopState, so every agent starts with the user's question and the conversation,
+The SQL agent and the visualizer are built from the instructions and tools in
+crew/; each gets a task of its own, written from the LoopState, so every agent starts with the user's question and the conversation,
 and the visualizer and the answer analyst with what the agents before them found.
 """
 

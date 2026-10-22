@@ -183,7 +183,7 @@ def build_tools(ctx: ChatContext) -> tuple[list[Any], list[Any]]:
             lines.append(
                 "The leading candidates are too close to call. If the question does "
                 "not settle which table is meant, do not guess: report the candidates "
-                "so the coordinator can ask the user."
+                "so the user can be asked which one is meant."
             )
 
         for name in [c["table_name"] for c in found.candidates][:PASSPORTS_SHOWN]:
@@ -230,8 +230,7 @@ def build_tools(ctx: ChatContext) -> tuple[list[Any], list[Any]]:
         if ctx.last_query is None:
             return (
                 "ERROR: there are no rows to draw: nothing has been queried in this "
-                "conversation yet. Tell the coordinator that the Data Retrieval Analyst "
-                "has to retrieve the rows first."
+                "conversation yet: the Data Retrieval Analyst has to retrieve the rows first."
             )
         if ctx.charts >= MAX_CHARTS:
             return _out_of_budget("chart attempts")

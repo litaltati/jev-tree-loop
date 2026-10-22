@@ -1,11 +1,12 @@
-"""What the crew is doing right now — the steps the page shows while it waits.
+"""What the chat is doing right now — the steps the page shows while it waits.
 
-    ✓ Understanding the question     the coordinator reads it, until it delegates
-    ✓ Finding the data               the Data Retrieval Analyst at work
+    ✓ Understanding the question     Jev reads it (the tree's stages), until the data is looked up
+    ✓ Finding the data               the tree's query, or the Data Retrieval Analyst at work
     ◌ Building the chart             the Data Visualization Specialist at work
-      Preparing the answer           the coordinator again, after its coworkers
+      Preparing the answer           the answer analyst
 
-The steps come from the agents themselves (TracedAgent) and from the chart tool,
+The steps come from the agents themselves (TracedAgent), from the tree's query
+and from the chart tool,
 not from guesses: a step is ticked when its agent has finished, and the chart is
 ticked only when the sandbox has actually saved one.
 
@@ -27,8 +28,8 @@ logger = logging.getLogger(__name__)
 QUESTION, DATA, CHART, ANSWER = "question", "data", "chart", "answer"
 RUNNING, DONE, FAILED = "running", "done", "failed"
 
-# The coworker steps, by agent role (crew/agents.py). The coordinator's own work
-# is QUESTION before it delegates and ANSWER after.
+# The agents' steps, by role (jev_loop/agents.py). QUESTION is the time before the
+# first of them starts.
 STEP_BY_ROLE = {
     "Data Retrieval Analyst": DATA,
     "Data Visualization Specialist": CHART,
@@ -57,7 +58,7 @@ class Progress:
         with self._lock:
             if self._steps.get(QUESTION) == RUNNING:
                 self._steps[QUESTION] = DONE
-            # "Preparing the answer" was premature: the coordinator delegates more.
+            # "Preparing the answer" was premature: another agent works first.
             if self._steps.get(ANSWER) == RUNNING:
                 del self._steps[ANSWER]
             if step == CHART:

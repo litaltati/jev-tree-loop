@@ -23,7 +23,7 @@ class Task(StrEnum):
 
     DESCRIBE = "describe"          # Stage 2: compressed sheet -> JSON schema
     CATALOG = "catalog"            # Stage 4: table facts -> catalog descriptions
-    ORCHESTRATOR = "orchestrator"  # The chat crew: the coordinator who delegates
+    ORCHESTRATOR = "orchestrator"  # The chat: the answer analyst of the Jev loop
     SQL = "sql"                    # The chat crew: the data retrieval analyst
     VIZ = "viz"                    # The chat crew: the visualization specialist
     # Placeholder for future stages, for example:
@@ -90,9 +90,6 @@ class ModelRouter:
 
     def model_for(self, task: Task) -> str:
         return self.models[task]
-
-    def source_for(self, task: Task) -> str:
-        return self.sources[task]
 
     def table(self) -> list[tuple[str, str, str]]:
         """[(task, model, where it came from)] in the declaration order of Task."""

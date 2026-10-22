@@ -11,12 +11,9 @@ from typing import Any, Callable
 from pydantic import ValidationError
 
 from .models import SheetSchema, sanitize_table_name
-from .routing import DEFAULT_ROUTES, Task, resolve_model
+from .routing import Task, resolve_model
 
 logger = logging.getLogger(__name__)
-
-# The model for stage 2 is set in routing.py — this is just a convenience alias.
-DEFAULT_MODEL = DEFAULT_ROUTES[Task.DESCRIBE]
 
 SYSTEM_PROMPT = """Ты — анализатор структуры Excel-таблиц. Тебе дано сжатое представление одного листа Excel.
 Весь лист будет загружен в ОДНУ таблицу SQLite. Твоя задача — определить:

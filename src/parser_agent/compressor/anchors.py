@@ -70,13 +70,6 @@ class CompactSheet:
     original_n_cols: int = 0
     merged_ranges: list[str] = field(default_factory=list)  # in the original coordinates
 
-    def original_coords(self, new_row: int, new_col: int) -> tuple[int, int]:
-        return self.row_map[new_row], self.col_map[new_col]
-
-    def original_address(self, new_row: int, new_col: int) -> str:
-        row, col = self.original_coords(new_row, new_col)
-        return f"{get_column_letter(col)}{row}"
-
     def iter_cells(self) -> Iterator[tuple[int, int, CellInfo]]:
         """Non-empty cells in reading order (top to bottom, left to right)."""
         for (new_row, new_col) in sorted(self.cells):

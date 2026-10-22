@@ -21,7 +21,6 @@ hand.
 
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 import sqlite3
@@ -29,11 +28,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
-from .routing import DEFAULT_ROUTES, Task, resolve_model
+from .routing import Task, resolve_model
 
 logger = logging.getLogger(__name__)
-
-DEFAULT_MODEL = DEFAULT_ROUTES[Task.CATALOG]
 
 # One schema for every table the tool produces: SQLite has no schemas of its
 # own, and the field exists for the catalog the tables are published into.
@@ -513,8 +510,3 @@ async def build_catalog(
 def catalog_json(catalog: dict[str, Any]) -> str:
     """The passport as a file: UTF-8 as is, indented."""
     return json.dumps(catalog, ensure_ascii=False, indent=4) + "\n"
-
-
-def build_catalog_sync(db_path: str, table: str, **kwargs: Any) -> dict[str, Any]:
-    """A synchronous wrapper around build_catalog() for scripts and the REPL."""
-    return asyncio.run(build_catalog(db_path, table, **kwargs))
