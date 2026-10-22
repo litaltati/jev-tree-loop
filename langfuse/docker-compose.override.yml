@@ -1,0 +1,51 @@
+# Our changes to the official docker-compose.yml next to it (Langfuse v4.46.0).
+# That file is kept exactly as published, so a newer one can replace it as is;
+# compose merges this file over it automatically.
+#
+# * The stack is called langfuse-parser: its containers and volumes do not mix
+#   with any other compose project on this machine.
+# * Only the UI is published, and only on 127.0.0.1:3000. Postgres, ClickHouse,
+#   Redis and MinIO talk inside the stack's network: 5432 here already belongs
+#   to a native PostgreSQL, and nothing outside the stack needs them.
+# * The secrets come from langfuse/.env (written by init_env.py), not from the
+#   CHANGEME defaults of the official file.
+# * restart: unless-stopped — a stack that was stopped by hand stays stopped
+#   after Docker restarts; it takes about 4 GB of memory.
+# * Health checks, so that `docker compose ps` shows when the UI is ready. The
+#   Next.js servers listen on the container hostname, hence $(hostname).
+#
+# `!override` / `!reset` need Docker Compose >= 2.24.4.
+name: langfuse-parser
+
+services:
+  langfuse-web:
+    restart: unless-stopped
+    ports: !override
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://$$(hostname):3000/api/public/health > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+  langfuse-worker:
+    restart: unless-stopped
+    ports: !reset []
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://$$(hostname):3030/api/health > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+  clickhouse:
+    restart: unless-stopped
+    ports: !reset []
+  minio:
+    restart: unless-stopped
+    ports: !reset []
+  redis:
+    restart: unless-stopped
+    ports: !reset []
+  postgres:
+    restart: unless-stopped
+    ports: !reset []

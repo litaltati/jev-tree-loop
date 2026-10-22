@@ -1,0 +1,31 @@
+# Secrets: API keys, Langfuse keys and passwords
+.env
+.env.*
+!.env.example
+langfuse/.env
+
+# Your data and everything made from it: Excel reports, the database,
+# passports, charts, accounts and saved chats
+data/
+output/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+~$*
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# macOS and editors
+.DS_Store
+.vscode/
+.idea/
+
+# Results of the Jev checks (runs over real questions)
+jev_results/

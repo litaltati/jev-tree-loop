@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parser Agent — sign in</title>
+<style>
+:root{
+  --bg:#0a0809;
+  --panel:rgba(255,255,255,.035);
+  --panel-2:rgba(255,255,255,.055);
+  --line:rgba(255,255,255,.075);
+  --line-soft:rgba(255,255,255,.045);
+  --text:#f3eff6;
+  --muted:#9a92a4;
+  --muted-2:#6f6878;
+  --accent:#e3b8f5;
+  --accent-2:#a78bfa;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;display:grid;place-items:center;padding:16px;
+  background:
+    radial-gradient(900px 500px at 12% -5%, rgba(167,139,250,.18), transparent 60%),
+    radial-gradient(700px 500px at 92% 105%, rgba(227,184,245,.13), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font:14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.card{
+  width:100%;max-width:360px;padding:30px 28px 26px;border-radius:24px;
+  background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
+  border:1px solid var(--line);box-shadow:0 40px 120px rgba(0,0,0,.55);
+}
+.logo{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;letter-spacing:-.2px;margin-bottom:22px}
+.mark{
+  width:26px;height:26px;border-radius:9px;display:grid;place-items:center;font-size:12px;font-weight:700;
+  background:linear-gradient(140deg,var(--accent),var(--accent-2));color:#1a1220;
+}
+label{display:block;font-size:12.5px;color:var(--muted);margin:14px 0 6px}
+input{
+  width:100%;padding:11px 14px;border-radius:12px;font:inherit;color:inherit;
+  background:var(--panel);border:1px solid var(--line-soft);outline:none;transition:.18s;
+}
+input:focus{border-color:rgba(227,184,245,.35);box-shadow:0 0 0 3px rgba(227,184,245,.07)}
+button{
+  width:100%;margin-top:22px;padding:11px;border:0;border-radius:12px;cursor:pointer;
+  font:inherit;font-weight:600;color:#1a1220;
+  background:linear-gradient(140deg,var(--accent),var(--accent-2));
+}
+button:disabled{opacity:.5;cursor:default}
+.err{min-height:20px;margin:14px 0 0;color:#f0a6b1;font-size:13px}
+.hint{margin:18px 0 0;color:var(--muted-2);font-size:12px}
+</style>
+</head>
+<body>
+<form class="card" id="form" autocomplete="on">
+  <div class="logo"><span class="mark">PA</span> Parser Agent</div>
+  <label for="username" data-i18n="username">Username</label>
+  <input id="username" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required autofocus>
+  <label for="password" data-i18n="password">Password</label>
+  <input id="password" name="password" type="password" autocomplete="current-password" required>
+  <button type="submit" id="go" data-i18n="sign_in">Sign in</button>
+  <p class="err" id="err"></p>
+  <p class="hint" data-i18n="hint">Accounts are created by the administrator.</p>
+</form>
+<script>
+/* The interface language chosen in the chat (stored in this browser). */
+const I18N = {
+  en: { username: "Username", password: "Password", sign_in: "Sign in", hint: "Accounts are created by the administrator.",
+        failed: "Could not sign in", unreachable: "The server is not reachable" },
+  az: { username: "İstifadəçi adı", password: "Şifrə", sign_in: "Daxil ol", hint: "Hesabları administrator yaradır.",
+        failed: "Daxil olmaq mümkün olmadı", unreachable: "Serverə qoşulmaq mümkün deyil" },
+  ru: { username: "Имя пользователя", password: "Пароль", sign_in: "Войти", hint: "Учётные записи создаёт администратор.",
+        failed: "Не удалось войти", unreachable: "Сервер недоступен" },
+};
+let LANG = "en";
+try { if (I18N[localStorage.getItem("pa-lang")]) LANG = localStorage.getItem("pa-lang"); } catch {}
+const tr = (key) => I18N[LANG][key] || I18N.en[key];
+document.documentElement.lang = LANG;
+document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = tr(el.dataset.i18n); });
+
+const form = document.getElementById("form");
+const err = document.getElementById("err");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  err.textContent = "";
+  document.getElementById("go").disabled = true;
+  try {
+    const r = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: document.getElementById("username").value.trim(),
+        password: document.getElementById("password").value,
+      }),
+    });
+    if (r.ok) { location.href = "/"; return; }
+    const d = await r.json().catch(() => ({}));
+    err.textContent = d.detail || tr("failed");
+    document.getElementById("password").value = "";
+  } catch (x) {
+    err.textContent = tr("unreachable");
+  } finally {
+    document.getElementById("go").disabled = false;
+  }
+});
+</script>
+</body>
+</html>
