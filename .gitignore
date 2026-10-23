@@ -29,3 +29,12 @@ dist/
 
 # Results of the Jev checks (runs over real questions)
 jev_results/
+
+# The rest of Jev_Playground, kept next to the project but not part of it:
+# the benchmark (real chat questions), the deck, the diagrams, the first Jev
+# experiments and the old share package
+/bench/
+/presentation/
+/diagrams/
+/experiments/
+/share/

@@ -31,6 +31,7 @@ IMAGE = "parser-agent-chart-sandbox:1"
 SANDBOX_DIR = Path(__file__).resolve().parent / "sandbox"
 
 TIMEOUT_SECONDS = 30
+DOCKER_CHECK_SECONDS = 5   # a Docker that does not answer in this time counts as absent
 MEMORY = "512m"
 MAX_PNG_BYTES = 5 * 1024 * 1024
 PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
@@ -47,7 +48,14 @@ class ChartResult:
 
 
 def image_ready() -> bool:
-    result = subprocess.run(["docker", "image", "inspect", IMAGE], capture_output=True)
+    """Whether the image is there. A Docker that hangs (Docker Desktop not started
+    or stuck) or is not installed counts as no image: neither the server's start
+    nor an answer may wait on it."""
+    try:
+        result = subprocess.run(["docker", "image", "inspect", IMAGE], capture_output=True,
+                                timeout=DOCKER_CHECK_SECONDS)
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return False
     return result.returncode == 0
 
 
@@ -73,7 +81,8 @@ def run_chart_code(
     """Runs the code over the rows; on success the PNG is in charts_dir/<id>.png."""
     if not image_ready():
         return ChartResult(
-            error="The chart sandbox image is not built. The administrator has to run: "
+            error="The chart sandbox is not available: Docker does not answer or the image "
+            "is not built. The administrator has to start Docker or run: "
             "python3 -m parser_agent sandbox build"
         )
 

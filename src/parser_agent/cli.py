@@ -532,8 +532,9 @@ def serve(
 
     if not image_ready():
         typer.echo(
-            "Внимание: образ песочницы для графиков не собран — чат ответит, но без "
-            "графиков. Собрать: python3 -m parser_agent sandbox build",
+            "Внимание: песочница для графиков недоступна — Docker не отвечает или образ "
+            "не собран. Чат ответит, но без графиков. Запустите Docker Desktop или "
+            "соберите образ: python3 -m parser_agent sandbox build",
             err=True,
         )
     typer.echo(f"Интерфейс: http://{host}:{port}  (Ctrl+C — остановить)")
